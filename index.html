@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<!DOCTYPE html><html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sorteo Libertadores</title>
+<style>
+body{font-family:Arial;background:#0b0b0b;color:white;text-align:center;margin:0}
+header{padding:20px;font-size:28px;font-weight:bold}
+button{padding:12px 22px;font-size:18px;border-radius:8px;border:none;cursor:pointer;background:#e3b341;color:black;font-weight:bold}
+.container{max-width:1100px;margin:auto;padding:20px}
+.grupos{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:25px}
+.grupo{background:#1b1b1b;border-radius:12px;padding:14px;box-shadow:0 0 10px rgba(0,0,0,0.5)}
+.grupo h3{margin-top:0;color:#e3b341}
+.team{padding:6px 0;border-bottom:1px solid #333}
+.team:last-child{border-bottom:none}
+</style>
+</head><body>
+<header>Sorteo Libertadores</header>
+<div class="container">
+<button onclick="sortear()">Sortear Grupos</button>
+<div class="grupos" id="grupos"></div>
+</div><script>
+
+const bol1=[
+{nombre:"Flamengo",pais:"BRA"},
+{nombre:"Palmeiras",pais:"BRA"},
+{nombre:"Boca Juniors",pais:"ARG"},
+{nombre:"Peñarol",pais:"URU"},
+{nombre:"Nacional",pais:"URU"},
+{nombre:"LDU Quito",pais:"ECU"},
+{nombre:"Fluminense",pais:"BRA"},
+{nombre:"Ind. del Valle",pais:"ECU"}
+]
+
+const bol2=[
+{nombre:"Lanús",pais:"ARG"},
+{nombre:"Libertad",pais:"PAR"},
+{nombre:"Estudiantes",pais:"ARG"},
+{nombre:"Cerro Porteño",pais:"PAR"},
+{nombre:"Corinthians",pais:"BRA"},
+{nombre:"Bolívar",pais:"BOL"},
+{nombre:"Cruzeiro",pais:"BRA"},
+{nombre:"Universitario",pais:"PER"}
+]
+
+const bol3=[
+{nombre:"Junior",pais:"COL"},
+{nombre:"U Católica",pais:"CHI"},
+{nombre:"Rosario Central",pais:"ARG"},
+{nombre:"Santa Fe",pais:"COL"},
+{nombre:"Always Ready",pais:"BOL"},
+{nombre:"Coquimbo",pais:"CHI"},
+{nombre:"La Guaira",pais:"VEN"},
+{nombre:"Cusco",pais:"PER"}
+]
+
+const bol4=[
+{nombre:"Universidad Central",pais:"VEN"},
+{nombre:"Platense",pais:"ARG"},
+{nombre:"Ind. Rivadavia",pais:"ARG"},
+{nombre:"Mirassol",pais:"BRA"},
+{nombre:"Ind. Medellín",pais:"COL"},
+{nombre:"Tolima",pais:"COL"},
+{nombre:"Sporting Cristal",pais:"PER"},
+{nombre:"Barcelona",pais:"ECU"}
+]
+
+function shuffle(a){
+return a.sort(()=>Math.random()-0.5)
+}
+
+function sortear(){
+
+let grupos=[[],[],[],[],[],[],[],[]]
+
+let b1=shuffle([...bol1])
+let b2=shuffle([...bol2])
+let b3=shuffle([...bol3])
+let b4=shuffle([...bol4])
+
+for(let i=0;i<8;i++){
+ grupos[i].push(b1[i])
+}
+
+function agregar(bol){
+
+bol=shuffle([...bol])
+
+bol.forEach(eq=>{
+
+ for(let g of grupos){
+
+ let paises=g.map(t=>t.pais)
+
+ if(!paises.includes(eq.pais) && g.length<4){
+ g.push(eq)
+ return
+ }
+
+ }
+
+})
+
+}
+
+agregar(b2)
+agregar(b3)
+agregar(b4)
+
+mostrar(grupos)
+
+}
+
+function mostrar(grupos){
+
+let letras=["A","B","C","D","E","F","G","H"]
+
+let html=""
+
+grupos.forEach((g,i)=>{
+
+html+=`<div class="grupo">
+<h3>Grupo ${letras[i]}</h3>
+${g.map(t=>`<div class="team">${t.nombre}</div>`).join("")}
+</div>`
+
+})
+
+
+document.getElementById("grupos").innerHTML=html
+
+}
+
+</script></body>
+</html>
