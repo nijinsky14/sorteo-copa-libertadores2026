@@ -1,29 +1,71 @@
 <!DOCTYPE html>
-<!DOCTYPE html><html lang="es">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sorteo Libertadores</title>
+<title>Simulador Sorteo Libertadores</title>
 <style>
 body{font-family:Arial;background:#0b0b0b;color:white;text-align:center;margin:0}
-header{padding:20px;font-size:28px;font-weight:bold}
-button{padding:12px 22px;font-size:18px;border-radius:8px;border:none;cursor:pointer;background:#e3b341;color:black;font-weight:bold}
-.container{max-width:1100px;margin:auto;padding:20px}
-.grupos{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:25px}
-.grupo{background:#1b1b1b;border-radius:12px;padding:14px;box-shadow:0 0 10px rgba(0,0,0,0.5)}
+header{padding:20px;font-size:32px;font-weight:bold;color:#e3b341}
+.container{max-width:1200px;margin:auto;padding:20px}
+.controls{margin-bottom:20px}
+button{padding:12px 22px;font-size:18px;border-radius:8px;border:none;cursor:pointer;background:#e3b341;color:black;font-weight:bold;margin:5px}
+button:hover{opacity:0.85}
+
+.grupos{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:25px}
+.grupo{background:#1b1b1b;border-radius:12px;padding:14px;box-shadow:0 0 12px rgba(0,0,0,0.6);min-height:150px}
 .grupo h3{margin-top:0;color:#e3b341}
-.team{padding:6px 0;border-bottom:1px solid #333}
+.team{padding:8px 0;border-bottom:1px solid #333;font-size:15px;display:flex;align-items:center;gap:8px;justify-content:center}
 .team:last-child{border-bottom:none}
+
+.logo{width:20px;height:20px;border-radius:50%;background:#444}
+
+.bolilleros{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:20px}
+.bol{background:#151515;padding:10px;border-radius:10px}
+.bol h4{margin:0 0 10px 0;color:#e3b341}
+.ball{background:#2a2a2a;margin:4px;padding:6px;border-radius:6px;font-size:14px}
+
+.drawBox{
+margin-top:20px;
+font-size:22px;
+font-weight:bold;
+min-height:30px;
+}
+
+.share{
+margin-top:20px;
+font-size:14px;
+color:#ccc
+}
+
 </style>
-</head><body>
-<header>Sorteo Libertadores</header>
+</head>
+
+<body>
+<header>Simulador Sorteo Libertadores</header>
 <div class="container">
-<button onclick="sortear()">Sortear Grupos</button>
+
+<div class="controls">
+<button onclick="sortearAnimado()">🎲 Sortear Grupos</button>
+<button onclick="simular1000()">📊 Simular 1000</button>
+<button onclick="compartir()">📱 Compartir Sorteo</button>
+</div>
+
+<div class="drawBox" id="drawBox"></div>
+
+<div class="bolilleros" id="bolilleros"></div>
+
 <div class="grupos" id="grupos"></div>
-</div><script>
+
+<div class="share">Podés compartir este simulador con tus amigos</div>
+
+</div>
+
+<script>
+
+const flamengo={nombre:"Flamengo",pais:"BRA"}
 
 const bol1=[
-{nombre:"Flamengo",pais:"BRA"},
 {nombre:"Palmeiras",pais:"BRA"},
 {nombre:"Boca Juniors",pais:"ARG"},
 {nombre:"Peñarol",pais:"URU"},
@@ -70,20 +112,37 @@ function shuffle(a){
 return a.sort(()=>Math.random()-0.5)
 }
 
-function sortear(){
+function mostrarBolilleros(){
+
+let html=""
+let bols=[bol1,bol2,bol3,bol4]
+
+bols.forEach((b,i)=>{
+html+=`<div class="bol">
+<h4>Bolillero ${i+1}</h4>
+${b.map(t=>`<div class="ball">${t.nombre}</div>`).join("")}
+</div>`
+})
+
+document.getElementById("bolilleros").innerHTML=html
+}
+
+function crearGruposBase(){
 
 let grupos=[[],[],[],[],[],[],[],[]]
 
-let b1=shuffle([...bol1])
-let b2=shuffle([...bol2])
-let b3=shuffle([...bol3])
-let b4=shuffle([...bol4])
+grupos[0].push(flamengo)
 
-for(let i=0;i<8;i++){
- grupos[i].push(b1[i])
+let b1=shuffle([...bol1])
+
+for(let i=1;i<8;i++){
+ grupos[i].push(b1[i-1])
 }
 
-function agregar(bol){
+return grupos
+}
+
+function agregarEquipos(grupos,bol){
 
 bol=shuffle([...bol])
 
@@ -104,11 +163,15 @@ bol.forEach(eq=>{
 
 }
 
-agregar(b2)
-agregar(b3)
-agregar(b4)
+function generarSorteo(){
 
-mostrar(grupos)
+let grupos=crearGruposBase()
+
+agregarEquipos(grupos,bol2)
+agregarEquipos(grupos,bol3)
+agregarEquipos(grupos,bol4)
+
+return grupos
 
 }
 
@@ -122,15 +185,89 @@ grupos.forEach((g,i)=>{
 
 html+=`<div class="grupo">
 <h3>Grupo ${letras[i]}</h3>
-${g.map(t=>`<div class="team">${t.nombre}</div>`).join("")}
+${g.map(t=>`<div class="team"><div class="logo"></div>${t.nombre}</div>`).join("")}
 </div>`
 
 })
-
 
 document.getElementById("grupos").innerHTML=html
 
 }
 
-</script></body>
+async function sortearAnimado(){
+
+let box=document.getElementById("drawBox")
+
+box.innerText="Mezclando bolillas..."
+
+await esperar(800)
+
+box.innerText="Sacando equipos del bolillero..."
+
+await esperar(800)
+
+let grupos=generarSorteo()
+
+mostrar(grupos)
+
+box.innerText="Sorteo completado"
+
+}
+
+function esperar(ms){
+return new Promise(r=>setTimeout(r,ms))
+}
+
+function simular1000(){
+
+let contador={}
+
+for(let i=0;i<1000;i++){
+
+let grupos=generarSorteo()
+
+grupos.forEach((g,gi)=>{
+
+let grupo=String.fromCharCode(65+gi)
+
+g.forEach(t=>{
+
+let key=t.nombre+"-"+grupo
+
+contador[key]=(contador[key]||0)+1
+
+})
+
+})
+
+}
+
+alert("Simulación completada (ver consola)")
+console.log(contador)
+
+}
+
+function compartir(){
+
+if(navigator.share){
+
+navigator.share({
+ title:"Simulador Libertadores",
+ text:"Probá este simulador del sorteo",
+ url:window.location.href
+})
+
+}else{
+
+navigator.clipboard.writeText(window.location.href)
+alert("Link copiado para compartir")
+
+}
+
+}
+
+mostrarBolilleros()
+
+</script>
+</body>
 </html>
