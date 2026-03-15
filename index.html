@@ -62,49 +62,35 @@ button:hover{opacity:0.9}
 const flags={ARG:"🇦🇷",BRA:"🇧🇷",URU:"🇺🇾",ECU:"🇪🇨",PAR:"🇵🇾",COL:"🇨🇴",PER:"🇵🇪",BOL:"🇧🇴",CHI:"🇨🇱",VEN:"🇻🇪"}
 function flag(code){return flags[code]||"🏳️"}
 
-const logos={
+function logo(nombre){
 
-"Flamengo":"https://upload.wikimedia.org/wikipedia/en/2/2e/Clube_de_Regatas_do_Flamengo_logo.svg",
-"Palmeiras":"https://upload.wikimedia.org/wikipedia/en/1/10/Palmeiras_logo.svg",
-"Boca Juniors":"https://upload.wikimedia.org/wikipedia/en/4/41/Boca_Juniors_logo18.svg",
-"Rosario Central":"https://upload.wikimedia.org/wikipedia/en/5/5e/Rosario_Central.svg",
-"Peñarol":"https://upload.wikimedia.org/wikipedia/en/3/3f/Club_Atl%C3%A9tico_Pe%C3%B1arol_logo.svg",
-"Nacional":"https://upload.wikimedia.org/wikipedia/en/3/35/Club_Nacional_de_Football_logo.svg",
+let id={
+"Flamengo":598,
+"Palmeiras":1903,
+"Boca Juniors":189,
+"Rosario Central":1037,
+"Peñarol":558,
+"Nacional":560,
 
-"LDU Quito":"https://upload.wikimedia.org/wikipedia/en/8/8d/LDU_Quito_logo.svg",
-"Fluminense":"https://upload.wikimedia.org/wikipedia/en/9/9e/Fluminense_FC_crest.svg",
-"Ind. del Valle":"https://upload.wikimedia.org/wikipedia/en/e/e7/Independiente_del_Valle_logo.svg",
+"Fluminense":1902,
+"Corinthians":1778,
+"Cruzeiro":1776,
 
-"Lanús":"https://upload.wikimedia.org/wikipedia/en/3/32/Club_Atl%C3%A9tico_Lan%C3%BAs_logo.svg",
-"Libertad":"https://upload.wikimedia.org/wikipedia/en/5/5c/Club_Libertad_logo.svg",
-"Estudiantes":"https://upload.wikimedia.org/wikipedia/en/2/28/Estudiantes_de_La_Plata_logo.svg",
-"Cerro Porteño":"https://upload.wikimedia.org/wikipedia/en/3/33/Cerro_Porte%C3%B1o_logo.svg",
-"Corinthians":"https://upload.wikimedia.org/wikipedia/en/5/5c/Sport_Club_Corinthians_Paulista_crest.svg",
-"Bolívar":"https://upload.wikimedia.org/wikipedia/en/0/0d/Club_Bol%C3%ADvar_logo.svg",
-"Cruzeiro":"https://upload.wikimedia.org/wikipedia/en/f/f1/Cruzeiro_Esporte_Clube_logo.svg",
-"Universitario":"https://upload.wikimedia.org/wikipedia/en/9/95/Club_Universitario_de_Deportes_logo.svg",
+"Estudiantes":1068,
+"Lanús":1067,
 
-"Junior":"https://upload.wikimedia.org/wikipedia/en/4/4e/Junior_FC_logo.svg",
-"U Católica":"https://upload.wikimedia.org/wikipedia/en/9/97/Club_Deportivo_Universidad_Cat%C3%B3lica_logo.svg",
-"Santa Fe":"https://upload.wikimedia.org/wikipedia/en/5/5a/Independiente_Santa_Fe_logo.svg",
-"Always Ready":"https://upload.wikimedia.org/wikipedia/en/0/0b/Club_Always_Ready_logo.svg",
-"Coquimbo":"https://upload.wikimedia.org/wikipedia/en/8/8e/Coquimbo_Unido_logo.svg",
-"La Guaira":"https://upload.wikimedia.org/wikipedia/en/3/35/Deportivo_La_Guaira_logo.svg",
-"Cusco":"https://upload.wikimedia.org/wikipedia/en/6/63/Cusco_FC_logo.svg",
+"Barcelona":1183,
 
-"Universidad Central":"https://upload.wikimedia.org/wikipedia/en/5/5f/Universidad_Central_de_Venezuela_FC_logo.svg",
-"Platense":"https://upload.wikimedia.org/wikipedia/en/9/9c/Club_Atl%C3%A9tico_Platense_logo.svg",
-"Ind. Rivadavia":"https://upload.wikimedia.org/wikipedia/en/4/4c/Independiente_Rivadavia_logo.svg",
-"Mirassol":"https://upload.wikimedia.org/wikipedia/en/1/1e/Mirassol_FC_logo.svg",
-"Ind. Medellín":"https://upload.wikimedia.org/wikipedia/en/4/4e/Independiente_Medell%C3%ADn_logo.svg",
-"Tolima":"https://upload.wikimedia.org/wikipedia/en/3/3f/Deportes_Tolima_logo.svg",
-"Sporting Cristal":"https://upload.wikimedia.org/wikipedia/en/3/3c/Sporting_Cristal_logo.svg",
-"Barcelona":"https://upload.wikimedia.org/wikipedia/en/0/0b/Barcelona_SC_logo.svg"
-
+"Sporting Cristal":1213,
+"Universitario":1211
 }
 
-function logo(nombre){return logos[nombre]||"https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"}
+if(id[nombre]){
+return "https://crests.football-data.org/"+id[nombre]+".png"
+}
 
+return "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+}
 const flamengo={nombre:"Flamengo",pais:"BRA"}
 
 const bol1=[
