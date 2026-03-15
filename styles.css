@@ -8,10 +8,10 @@ body{
 
 /* estilo para los escudos */
 .logo{
-.logo{
-width:28px;
-height:28px;
+width:30px;
+height:30px;
 object-fit:contain;
 background:white;
-border-radius:6px;
+border-radius:50%;
+padding:2px;
 }
