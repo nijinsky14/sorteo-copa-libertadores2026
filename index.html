@@ -3,52 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador Sorteo Libertadores</title>
+<title>Simulador Profesional Sorteo Libertadores</title>
 <style>
 body{font-family:Arial;background:#0b0b0b;color:white;text-align:center;margin:0}
 header{padding:20px;font-size:32px;font-weight:bold;color:#e3b341}
 .container{max-width:1200px;margin:auto;padding:20px}
 .controls{margin-bottom:20px}
-button{padding:12px 22px;font-size:18px;border-radius:8px;border:none;cursor:pointer;background:#e3b341;color:black;font-weight:bold;margin:5px}
-button:hover{opacity:0.85}
+button{padding:12px 22px;font-size:17px;border-radius:8px;border:none;cursor:pointer;background:#e3b341;color:black;font-weight:bold;margin:6px}
+button:hover{opacity:0.9}
 
 .grupos{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:25px}
-.grupo{background:#1b1b1b;border-radius:12px;padding:14px;box-shadow:0 0 12px rgba(0,0,0,0.6);min-height:150px}
+.grupo{background:#1b1b1b;border-radius:12px;padding:14px;box-shadow:0 0 12px rgba(0,0,0,0.6);min-height:170px}
 .grupo h3{margin-top:0;color:#e3b341}
-.team{padding:8px 0;border-bottom:1px solid #333;font-size:15px;display:flex;align-items:center;gap:8px;justify-content:center}
+
+.team{padding:7px 0;border-bottom:1px solid #333;font-size:14px;display:flex;align-items:center;gap:10px}
 .team:last-child{border-bottom:none}
 
-.logo{width:20px;height:20px;border-radius:50%;background:#444}
+.logo{width:22px;height:22px;border-radius:50%;object-fit:contain;background:white}
+.flag{font-size:16px}
+.country{font-size:12px;color:#aaa;margin-left:auto}
 
 .bolilleros{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:20px}
 .bol{background:#151515;padding:10px;border-radius:10px}
 .bol h4{margin:0 0 10px 0;color:#e3b341}
 .ball{background:#2a2a2a;margin:4px;padding:6px;border-radius:6px;font-size:14px}
 
-.drawBox{
-margin-top:20px;
-font-size:22px;
-font-weight:bold;
-min-height:30px;
-}
+.drawBox{margin-top:20px;font-size:22px;font-weight:bold;min-height:30px}
 
-.share{
-margin-top:20px;
-font-size:14px;
-color:#ccc
-}
+.stats{margin-top:30px;font-size:14px;color:#ccc;text-align:left}
 
 </style>
 </head>
 
 <body>
-<header>Simulador Sorteo Libertadores</header>
+<header>Simulador Profesional Sorteo Libertadores</header>
 <div class="container">
 
 <div class="controls">
-<button onclick="sortearAnimado()">🎲 Sortear Grupos</button>
+<button onclick="sortearPasoAPaso()">🎲 Sorteo paso a paso</button>
+<button onclick="simularCentral()">🧠 Probabilidad grupo Central</button>
+<button onclick="probabilidadRivales()">⚽ Probabilidad rivales Central</button>
 <button onclick="simular1000()">📊 Simular 1000</button>
-<button onclick="compartir()">📱 Compartir Sorteo</button>
+<button onclick="compartir()">📱 Compartir</button>
 </div>
 
 <div class="drawBox" id="drawBox"></div>
@@ -57,11 +53,25 @@ color:#ccc
 
 <div class="grupos" id="grupos"></div>
 
-<div class="share">Podés compartir este simulador con tus amigos</div>
+<div class="stats" id="stats"></div>
 
 </div>
 
 <script>
+
+const flags={ARG:"🇦🇷",BRA:"🇧🇷",URU:"🇺🇾",ECU:"🇪🇨",PAR:"🇵🇾",COL:"🇨🇴",PER:"🇵🇪",BOL:"🇧🇴",CHI:"🇨🇱",VEN:"🇻🇪"}
+function flag(code){return flags[code]||"🏳️"}
+
+const logos={
+"Flamengo":"https://upload.wikimedia.org/wikipedia/en/2/2e/Clube_de_Regatas_do_Flamengo_logo.svg",
+"Palmeiras":"https://upload.wikimedia.org/wikipedia/en/1/10/Palmeiras_logo.svg",
+"Boca Juniors":"https://upload.wikimedia.org/wikipedia/en/4/41/Boca_Juniors_logo18.svg",
+"Rosario Central":"https://upload.wikimedia.org/wikipedia/en/5/5e/Rosario_Central.svg",
+"Peñarol":"https://upload.wikimedia.org/wikipedia/en/3/3f/Club_Atl%C3%A9tico_Pe%C3%B1arol_logo.svg",
+"Nacional":"https://upload.wikimedia.org/wikipedia/en/3/35/Club_Nacional_de_Football_logo.svg"
+}
+
+function logo(nombre){return logos[nombre]||"https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"}
 
 const flamengo={nombre:"Flamengo",pais:"BRA"}
 
@@ -108,162 +118,128 @@ const bol4=[
 {nombre:"Barcelona",pais:"ECU"}
 ]
 
-function shuffle(a){
-return a.sort(()=>Math.random()-0.5)
-}
+function shuffle(a){return a.sort(()=>Math.random()-0.5)}
 
 function mostrarBolilleros(){
-
 let html=""
 let bols=[bol1,bol2,bol3,bol4]
-
 bols.forEach((b,i)=>{
-html+=`<div class="bol">
-<h4>Bolillero ${i+1}</h4>
-${b.map(t=>`<div class="ball">${t.nombre}</div>`).join("")}
-</div>`
+html+=`<div class="bol"><h4>Bolillero ${i+1}</h4>${b.map(t=>`<div class="ball">${flag(t.pais)} ${t.nombre}</div>`).join("")}</div>`
 })
-
-document.getElementById("bolilleros").innerHTML=html
+bolilleros.innerHTML=html
 }
 
 function crearGruposBase(){
-
 let grupos=[[],[],[],[],[],[],[],[]]
-
 grupos[0].push(flamengo)
-
 let b1=shuffle([...bol1])
-
-for(let i=1;i<8;i++){
- grupos[i].push(b1[i-1])
-}
-
+for(let i=1;i<8;i++){grupos[i].push(b1[i-1])}
 return grupos
 }
 
 function agregarEquipos(grupos,bol){
-
 bol=shuffle([...bol])
-
 bol.forEach(eq=>{
-
  for(let g of grupos){
-
  let paises=g.map(t=>t.pais)
-
- if(!paises.includes(eq.pais) && g.length<4){
- g.push(eq)
- return
+ if(!paises.includes(eq.pais)&&g.length<4){g.push(eq);return}
  }
-
- }
-
 })
-
 }
 
 function generarSorteo(){
-
 let grupos=crearGruposBase()
-
 agregarEquipos(grupos,bol2)
 agregarEquipos(grupos,bol3)
 agregarEquipos(grupos,bol4)
-
 return grupos
-
 }
 
 function mostrar(grupos){
-
 let letras=["A","B","C","D","E","F","G","H"]
-
 let html=""
 
 grupos.forEach((g,i)=>{
-
-html+=`<div class="grupo">
-<h3>Grupo ${letras[i]}</h3>
-${g.map(t=>`<div class="team"><div class="logo"></div>${t.nombre}</div>`).join("")}
-</div>`
-
+html+=`<div class="grupo"><h3>Grupo ${letras[i]}</h3>${g.map(t=>`<div class="team"><img class="logo" src="${logo(t.nombre)}"><span class="flag">${flag(t.pais)}</span><span>${t.nombre}</span><span class="country">${t.pais}</span></div>`).join("")}</div>`
 })
 
-document.getElementById("grupos").innerHTML=html
+gruposDiv.innerHTML=html
 
+// guardar en URL
+let data=btoa(JSON.stringify(grupos))
+history.replaceState(null,"","?sorteo="+data)
 }
 
-async function sortearAnimado(){
-
+async function sortearPasoAPaso(){
 let box=document.getElementById("drawBox")
-
-box.innerText="Mezclando bolillas..."
-
-await esperar(800)
-
-box.innerText="Sacando equipos del bolillero..."
-
-await esperar(800)
-
-let grupos=generarSorteo()
-
-mostrar(grupos)
-
-box.innerText="Sorteo completado"
-
+box.innerText="Preparando bolilleros...";await esperar(700)
+box.innerText="Sorteando cabezas de serie...";await esperar(700)
+let grupos=crearGruposBase();mostrar(grupos)
+await esperar(700)
+box.innerText="Bolillero 2";agregarEquipos(grupos,bol2);mostrar(grupos)
+await esperar(700)
+box.innerText="Bolillero 3";agregarEquipos(grupos,bol3);mostrar(grupos)
+await esperar(700)
+box.innerText="Bolillero 4";agregarEquipos(grupos,bol4);mostrar(grupos)
+box.innerText="Sorteo terminado"
 }
 
-function esperar(ms){
-return new Promise(r=>setTimeout(r,ms))
-}
+function esperar(ms){return new Promise(r=>setTimeout(r,ms))}
 
-function simular1000(){
-
-let contador={}
-
-for(let i=0;i<1000;i++){
-
+function simularCentral(){
+let conteo={}
+for(let i=0;i<5000;i++){
 let grupos=generarSorteo()
-
 grupos.forEach((g,gi)=>{
-
 let grupo=String.fromCharCode(65+gi)
+if(g.find(t=>t.nombre=="Rosario Central")){
+conteo[grupo]=(conteo[grupo]||0)+1
+}
+})
+}
+let texto="Probabilidad de grupo para Rosario Central (5000 simulaciones):<br><br>"
+Object.keys(conteo).sort().forEach(g=>{texto+=`Grupo ${g}: ${conteo[g]}<br>`})
+stats.innerHTML=texto
+}
 
+function probabilidadRivales(){
+let conteo={}
+for(let i=0;i<5000;i++){
+let grupos=generarSorteo()
+let g=grupos.find(gr=>gr.find(t=>t.nombre=="Rosario Central"))
 g.forEach(t=>{
-
-let key=t.nombre+"-"+grupo
-
-contador[key]=(contador[key]||0)+1
-
+if(t.nombre!="Rosario Central"){
+conteo[t.nombre]=(conteo[t.nombre]||0)+1
+}
 })
-
-})
-
 }
 
-alert("Simulación completada (ver consola)")
-console.log(contador)
+let texto="Probabilidad de rivales de Rosario Central:<br><br>"
+Object.keys(conteo).sort((a,b)=>conteo[b]-conteo[a]).forEach(t=>{
+texto+=`${t}: ${conteo[t]} veces<br>`
+})
 
+stats.innerHTML=texto
 }
+
+function simular1000(){for(let i=0;i<1000;i++)generarSorteo();alert("1000 sorteos simulados")}
 
 function compartir(){
-
 if(navigator.share){
-
-navigator.share({
- title:"Simulador Libertadores",
- text:"Probá este simulador del sorteo",
- url:window.location.href
-})
-
+navigator.share({title:"Simulador Libertadores",text:"Probá este simulador",url:window.location.href})
 }else{
-
 navigator.clipboard.writeText(window.location.href)
-alert("Link copiado para compartir")
-
+alert("Link copiado")
+}
 }
 
+const gruposDiv=document.getElementById("grupos")
+
+// cargar sorteo desde URL
+const params=new URLSearchParams(window.location.search)
+if(params.get("sorteo")){
+let grupos=JSON.parse(atob(params.get("sorteo")))
+mostrar(grupos)
 }
 
 mostrarBolilleros()
