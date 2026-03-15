@@ -60,7 +60,19 @@ button:hover{opacity:0.9}
 
 <script>
 
+const flags={ARG:"🇦🇷",BRA:"🇧🇷",URU:"🇺🇾",ECU:"🇪🇨",PAR:"🇵🇾",COL:"🇨🇴",PER:"🇵🇪",BOL:"🇧🇴",CHI:"🇨🇱",VEN:"🇻🇪"}
+function flag(code){return flags[code]||"🏳️"}
 
+const logos={
+"Flamengo":"https://upload.wikimedia.org/wikipedia/en/2/2e/Clube_de_Regatas_do_Flamengo_logo.svg",
+"Palmeiras":"https://upload.wikimedia.org/wikipedia/en/1/10/Palmeiras_logo.svg",
+"Boca Juniors":"https://upload.wikimedia.org/wikipedia/en/4/41/Boca_Juniors_logo18.svg",
+"Rosario Central":"https://upload.wikimedia.org/wikipedia/en/5/5e/Rosario_Central.svg",
+"Peñarol":"https://upload.wikimedia.org/wikipedia/en/3/3f/Club_Atl%C3%A9tico_Pe%C3%B1arol_logo.svg",
+"Nacional":"https://upload.wikimedia.org/wikipedia/en/3/35/Club_Nacional_de_Football_logo.svg"
+}
+
+function logo(nombre){return logos[nombre]||"https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"}
 
 function logo(nombre){return logos[nombre]||"https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"}
 
