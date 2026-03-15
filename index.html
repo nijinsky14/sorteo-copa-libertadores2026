@@ -63,41 +63,6 @@ button:hover{opacity:0.9}
 const flags={ARG:"🇦🇷",BRA:"🇧🇷",URU:"🇺🇾",ECU:"🇪🇨",PAR:"🇵🇾",COL:"🇨🇴",PER:"🇵🇪",BOL:"🇧🇴",CHI:"🇨🇱",VEN:"🇻🇪"}
 function flag(code){return flags[code]||"🏳️"}
 
-const escudos = {
-  "Lanús": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Escudo_del_Club_Atletico_Lan%C3%BAs.png/330px-Escudo_del_Club_Atletico_Lan%C3%BAs.png",
-  "Platense": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Club_Alt%C3%A9tico_Platense_crest_%282025%29.svg/250px-Club_Alt%C3%A9tico_Platense_crest_%282025%29.svg.png",
-  "Estudiantes": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Estudiantes_de_la_Plata_crest_%282025%29.svg/330px-Estudiantes_de_la_Plata_crest_%282025%29.svg.png",
-  "Independiente Rivadavia": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Escudo_del_Club_Independiente_Rivadavia.svg/330px-Escudo_del_Club_Independiente_Rivadavia.svg.png",
-  "Rosario Central": "https://i.pinimg.com/736x/ec/95/0e/ec950e5576ca874f5a2defc7d6f5964e.jpg",
-  "Boca Juniors": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/CABJ70.png/330px-CABJ70.png",
-
-  "Flamengo": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Clube_de_Regatas_do_Flamengo_logo.svg/330px-Clube_de_Regatas_do_Flamengo_logo.svg.png",
-  "Palmeiras": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/SE_Palmeiras_2025_crest.png/330px-SE_Palmeiras_2025_crest.png",
-  "Peñarol": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Escudo-club-atletico-penarol.png/250px-Escudo-club-atletico-penarol.png",
-  "Nacional": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Club_Nacional_de_Football.png/330px-Club_Nacional_de_Football.png",
-  "Atlético Mineiro": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/LOGO_5TA._ESTRELLA.png/330px-LOGO_5TA._ESTRELLA.png",
-  "Fluminense": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Fluminense_FC_escudo.png/330px-Fluminense_FC_escudo.png",
-  "Independiente del Valle": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Escudoindependientedelvalle2023.png/330px-Escudoindependientedelvalle2023.png",
-  "Libertad": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Club_Libertad.png/500px-Club_Libertad.png",
-  "Cerro Porteño": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Escudo_Club_Cerro_Porte%C3%B1o_2023-Actual.svg/330px-Escudo_Club_Cerro_Porte%C3%B1o_2023-Actual.svg.png",
-  "Corinthians": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Corinthians_Escudo.jpg/330px-Corinthians_Escudo.jpg",
-  "Bolívar": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Emblem_bolivar.png/330px-Emblem_bolivar.png",
-  "Cruzeiro": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg/330px-Cruzeiro_Esporte_Clube_%28logo%29.svg.png",
-  "Universitario": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Logo_oficial_de_Universitario.png/330px-Logo_oficial_de_Universitario.png",
-  "Junior": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/ESCUDO_JUNIOR.svg/330px-ESCUDO_JUNIOR.svg.png",
-  "Universidad Católica": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg/330px-Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png",
-  "Santa Fe": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Escudo_de_Independiente_Santa_Fe.png/330px-Escudo_de_Independiente_Santa_Fe.png",
-  "Always Ready": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Club_Always_Ready_Bol%C3%ADvia.png/330px-Club_Always_Ready_Bol%C3%ADvia.png",
-  "Colo Colo": "https://i.pinimg.com/736x/ea/8b/87/ea8b87832024ec39abac8ffe28a91feb.jpg",
-  "Deportivo La Guaira": "https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Deportivo_La_Guaira_logo.png/120px-Deportivo_La_Guaira_logo.png",
-  "Caracas": "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/11995.png&h=200&w=200",
-  "The Strongest": "https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/10094.png&h=200&w=200",
-  "Mirassol": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Mirassol_FC_logo.png/330px-Mirassol_FC_logo.png",
-  "Independiente Medellín": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Escudo_del_Deportivo_Independiente_Medell%C3%ADn.png/330px-Escudo_del_Deportivo_Independiente_Medell%C3%ADn.png",
-  "Deportes Tolima": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Escudo_del_Deportes_Tolima.svg/330px-Escudo_del_Deportes_Tolima.svg.png",
-  "Sporting Cristal": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Escudo_de_Sporting_Cristal_2025.svg/250px-Escudo_de_Sporting_Cristal_2025.svg.png",
-  "Barcelona SC": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Barcelona_Sporting_Club_Logo.png/330px-Barcelona_Sporting_Club_Logo.png"
-};
 
 
 const flamengo={nombre:"Flamengo",pais:"BRA"}
