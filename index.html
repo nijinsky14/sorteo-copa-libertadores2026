@@ -19,8 +19,8 @@ button:hover{opacity:0.9}
 .team{padding:7px 0;border-bottom:1px solid #333;font-size:14px;display:flex;align-items:center;gap:10px}
 .team:last-child{border-bottom:none}
 
-.logo{width:22px;height:22px;border-radius:50%;object-fit:contain;background:white}
-.flag{font-size:16px}
+.logo{width:26px;height:26px;border-radius:50%;object-fit:cover;background:#fff;border:1px solid #444;flex:0 0 26px}
+.flag-img{width:22px;height:16px;object-fit:cover;border-radius:3px;vertical-align:middle;flex:0 0 22px}
 .country{font-size:12px;color:#aaa;margin-left:auto}
 
 .bolilleros{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:20px}
@@ -31,6 +31,16 @@ button:hover{opacity:0.9}
 .drawBox{margin-top:20px;font-size:22px;font-weight:bold;min-height:30px}
 
 .stats{margin-top:30px;font-size:14px;color:#ccc;text-align:left}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;align-items:center;justify-content:center}
+.modal-overlay.active{display:flex}
+.modal-box{background:#1b1b1b;border-radius:14px;padding:24px;max-width:480px;width:90%;box-shadow:0 0 30px rgba(0,0,0,0.8)}
+.modal-box h3{color:#e3b341;margin-top:0}
+.modal-box textarea{width:100%;height:220px;background:#0b0b0b;color:#eee;border:1px solid #444;border-radius:8px;padding:10px;font-size:13px;resize:none;box-sizing:border-box}
+.modal-btns{display:flex;gap:10px;margin-top:14px;justify-content:center}
+.btn-wa{background:#25D366;color:white;font-weight:bold}
+.btn-copy{background:#e3b341;color:black;font-weight:bold}
+.btn-close{background:#444;color:white}
 
 </style>
 </head>
@@ -58,27 +68,82 @@ button:hover{opacity:0.9}
 
 </div>
 
+<div class="modal-overlay" id="shareModal">
+  <div class="modal-box">
+    <h3>📋 Resultado del sorteo</h3>
+    <textarea id="shareText" readonly></textarea>
+    <div class="modal-btns">
+      <button class="btn-copy" onclick="copiarTexto()">📋 Copiar</button>
+      <button class="btn-wa" onclick="abrirWhatsApp()">💬 WhatsApp</button>
+      <button class="btn-close" onclick="cerrarModal()">✕ Cerrar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 
-const flags={ARG:"🇦🇷",BRA:"🇧🇷",URU:"🇺🇾",ECU:"🇪🇨",PAR:"🇵🇾",COL:"🇨🇴",PER:"🇵🇪",BOL:"🇧🇴",CHI:"🇨🇱",VEN:"🇻🇪"}
-function flag(code){return flags[code]||"🏳️"}
+const flagCodes={ARG:"ar",BRA:"br",URU:"uy",ECU:"ec",PAR:"py",COL:"co",PER:"pe",BOL:"bo",CHI:"cl",VEN:"ve"}
+const countryNames={
+ARG:"Argentina",BRA:"Brasil",URU:"Uruguay",ECU:"Ecuador",PAR:"Paraguay",
+COL:"Colombia",PER:"Perú",BOL:"Bolivia",CHI:"Chile",VEN:"Venezuela"
+}
+function flag(code){const c=flagCodes[code];return c?`<img class="flag-img" src="https://flagcdn.com/20x15/${c}.png" alt="${code}" title="${countryNames[code]||code}">`:""}
 
 const logos={
-"Flamengo":"https://upload.wikimedia.org/wikipedia/en/2/2e/Clube_de_Regatas_do_Flamengo_logo.svg",
-"Palmeiras":"https://upload.wikimedia.org/wikipedia/en/1/10/Palmeiras_logo.svg",
-"Boca Juniors":"https://upload.wikimedia.org/wikipedia/en/4/41/Boca_Juniors_logo18.svg",
-"Rosario Central":"https://upload.wikimedia.org/wikipedia/en/5/5e/Rosario_Central.svg",
-"Peñarol":"https://upload.wikimedia.org/wikipedia/en/3/3f/Club_Atl%C3%A9tico_Pe%C3%B1arol_logo.svg",
-"Nacional":"https://upload.wikimedia.org/wikipedia/en/3/35/Club_Nacional_de_Football_logo.svg"
+"Flamengo":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Clube_de_Regatas_do_Flamengo_logo.svg/330px-Clube_de_Regatas_do_Flamengo_logo.svg.png",
+"Palmeiras":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/SE_Palmeiras_2025_crest.png/330px-SE_Palmeiras_2025_crest.png",
+"Boca Juniors":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/CABJ70.png/330px-CABJ70.png",
+"Peñarol":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Escudo-club-atletico-penarol.png/250px-Escudo-club-atletico-penarol.png",
+"Nacional":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Club_Nacional_de_Football.png/330px-Club_Nacional_de_Football.png",
+"LDU Quito":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/LOGO_5TA._ESTRELLA.png/330px-LOGO_5TA._ESTRELLA.png",
+"Fluminense":"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Fluminense_FC_escudo.png/330px-Fluminense_FC_escudo.png",
+"Ind. del Valle":"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Escudoindependientedelvalle2023.png/330px-Escudoindependientedelvalle2023.png",
+"Lanús":"https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Escudo_del_Club_Atletico_Lan%C3%BAs.png/330px-Escudo_del_Club_Atletico_Lan%C3%BAs.png",
+"Libertad":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Club_Libertad.png/500px-Club_Libertad.png",
+"Estudiantes":"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Estudiantes_de_la_Plata_crest_%282025%29.svg/330px-Estudiantes_de_la_Plata_crest_%282025%29.svg.png",
+"Cerro Porteño":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Escudo_Club_Cerro_Porte%C3%B1o_2023-Actual.svg/330px-Escudo_Club_Cerro_Porte%C3%B1o_2023-Actual.svg.png",
+"Corinthians":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Corinthians_Escudo.jpg/330px-Corinthians_Escudo.jpg",
+"Bolívar":"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Emblem_bolivar.png/330px-Emblem_bolivar.png",
+"Cruzeiro":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Cruzeiro_Esporte_Clube_%28logo%29.svg/330px-Cruzeiro_Esporte_Clube_%28logo%29.svg.png",
+"Universitario":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Logo_oficial_de_Universitario.png/330px-Logo_oficial_de_Universitario.png",
+"Junior":"https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/ESCUDO_JUNIOR.svg/330px-ESCUDO_JUNIOR.svg.png",
+"U Católica":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg/330px-Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png",
+"Rosario Central":"https://i.pinimg.com/736x/ec/95/0e/ec950e5576ca874f5a2defc7d6f5964e.jpg",
+"Santa Fe":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Escudo_de_Independiente_Santa_Fe.png/330px-Escudo_de_Independiente_Santa_Fe.png",
+"Always Ready":"https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Club_Always_Ready_Bol%C3%ADvia.png/330px-Club_Always_Ready_Bol%C3%ADvia.png",
+"Coquimbo":"https://i.pinimg.com/736x/ea/8b/87/ea8b87832024ec39abac8ffe28a91feb.jpg",
+"La Guaira":"https://upload.wikimedia.org/wikipedia/en/thumb/f/fa/Deportivo_La_Guaira_logo.png/120px-Deportivo_La_Guaira_logo.png",
+"Cusco":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/11995.png&h=200&w=200",
+"Universidad Central":"https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/10094.png&h=200&w=200",
+"Platense":"https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Club_Alt%C3%A9tico_Platense_crest_%282025%29.svg/250px-Club_Alt%C3%A9tico_Platense_crest_%282025%29.svg.png",
+"Ind. Rivadavia":"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Escudo_del_Club_Independiente_Rivadavia.svg/330px-Escudo_del_Club_Independiente_Rivadavia.svg.png",
+"Mirassol":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Mirassol_FC_logo.png/330px-Mirassol_FC_logo.png",
+"Ind. Medellín":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Escudo_del_Deportivo_Independiente_Medell%C3%ADn.png/330px-Escudo_del_Deportivo_Independiente_Medell%C3%ADn.png",
+"Tolima":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Escudo_del_Deportes_Tolima.svg/330px-Escudo_del_Deportes_Tolima.svg.png",
+"Sporting Cristal":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Escudo_de_Sporting_Cristal_2025.svg/250px-Escudo_de_Sporting_Cristal_2025.svg.png",
+"Barcelona":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Barcelona_Sporting_Club_Logo.png/330px-Barcelona_Sporting_Club_Logo.png"
 }
 
-function logo(nombre){return logos[nombre]||"https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"}
+function crearEscudoLocal(equipo){
+const iniciales=equipo.nombre.split(" ").map(p=>p[0]).join("").slice(0,3).toUpperCase()
+const colores={
+ARG:["#6ec1ff","#ffffff"],BRA:["#1f9d55","#f5c518"],URU:["#8ec5ff","#ffffff"],
+ECU:["#f5c518","#1f3b73"],PAR:["#d92626","#ffffff"],COL:["#f5c518","#1f3b73"],
+PER:["#d92626","#ffffff"],BOL:["#1f9d55","#d92626"],CHI:["#1f3b73","#d92626"],VEN:["#f5c518","#1f3b73"]
+}
+const [c1,c2]=colores[equipo.pais]||["#1f3b73","#ffffff"]
+const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'>
+<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='${c1}'/><stop offset='100%' stop-color='${c2}'/></linearGradient></defs>
+<circle cx='20' cy='20' r='19' fill='url(#g)' stroke='#111' stroke-width='2'/>
+<text x='20' y='24' text-anchor='middle' font-family='Arial' font-size='12' font-weight='700' fill='#111'>${iniciales}</text>
+</svg>`
+return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
+}
 
-function logo(nombre){return logos[nombre]||"https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"}
-
-const flamengo={nombre:"Flamengo",pais:"BRA"}
+function logo(equipo){return logos[equipo.nombre]||crearEscudoLocal(equipo)}
 
 const bol1=[
+{nombre:"Flamengo",pais:"BRA"},
 {nombre:"Palmeiras",pais:"BRA"},
 {nombre:"Boca Juniors",pais:"ARG"},
 {nombre:"Peñarol",pais:"URU"},
@@ -89,10 +154,10 @@ const bol1=[
 ]
 
 const bol2=[
-{nombre:"Lanús",pais:"ARG"},
 {nombre:"Libertad",pais:"PAR"},
 {nombre:"Estudiantes",pais:"ARG"},
 {nombre:"Cerro Porteño",pais:"PAR"},
+{nombre:"Lanús",pais:"ARG"},
 {nombre:"Corinthians",pais:"BRA"},
 {nombre:"Bolívar",pais:"BOL"},
 {nombre:"Cruzeiro",pais:"BRA"},
@@ -115,10 +180,10 @@ const bol4=[
 {nombre:"Platense",pais:"ARG"},
 {nombre:"Ind. Rivadavia",pais:"ARG"},
 {nombre:"Mirassol",pais:"BRA"},
-{nombre:"Ind. Medellín",pais:"COL"},
-{nombre:"Tolima",pais:"COL"},
+{nombre:"Barcelona",pais:"ECU"},
 {nombre:"Sporting Cristal",pais:"PER"},
-{nombre:"Barcelona",pais:"ECU"}
+{nombre:"Tolima",pais:"COL"},
+{nombre:"Ind. Medellín",pais:"COL"}
 ]
 
 function shuffle(a){return a.sort(()=>Math.random()-0.5)}
@@ -134,28 +199,41 @@ bolilleros.innerHTML=html
 
 function crearGruposBase(){
 let grupos=[[],[],[],[],[],[],[],[]]
-grupos[0].push(flamengo)
 let b1=shuffle([...bol1])
-for(let i=1;i<8;i++){grupos[i].push(b1[i-1])}
+for(let i=0;i<8;i++){grupos[i].push(b1[i])}
 return grupos
+}
+
+function asignarBolilleroConBacktracking(grupos,equipos,grupoIndex=0){
+if(grupoIndex===grupos.length)return true
+
+const paisesGrupo=grupos[grupoIndex].map(t=>t.pais)
+const candidatos=shuffle(equipos.filter(eq=>!paisesGrupo.includes(eq.pais)))
+
+for(const eq of candidatos){
+grupos[grupoIndex].push(eq)
+const restantes=equipos.filter(t=>t!==eq)
+if(asignarBolilleroConBacktracking(grupos,restantes,grupoIndex+1))return true
+grupos[grupoIndex].pop()
+}
+
+return false
 }
 
 function agregarEquipos(grupos,bol){
-bol=shuffle([...bol])
-bol.forEach(eq=>{
- for(let g of grupos){
- let paises=g.map(t=>t.pais)
- if(!paises.includes(eq.pais)&&g.length<4){g.push(eq);return}
- }
-})
+return asignarBolilleroConBacktracking(grupos,shuffle([...bol]))
 }
 
 function generarSorteo(){
+for(let intento=0;intento<300;intento++){
 let grupos=crearGruposBase()
-agregarEquipos(grupos,bol2)
-agregarEquipos(grupos,bol3)
-agregarEquipos(grupos,bol4)
-return grupos
+const ok2=agregarEquipos(grupos,bol2)
+const ok3=ok2&&agregarEquipos(grupos,bol3)
+const ok4=ok3&&agregarEquipos(grupos,bol4)
+if(ok4)return grupos
+}
+
+throw new Error("No se pudo generar un sorteo válido")
 }
 
 function mostrar(grupos){
@@ -163,7 +241,7 @@ let letras=["A","B","C","D","E","F","G","H"]
 let html=""
 
 grupos.forEach((g,i)=>{
-html+=`<div class="grupo"><h3>Grupo ${letras[i]}</h3>${g.map(t=>`<div class="team"><img class="logo" src="${logo(t.nombre)}"><span class="flag">${flag(t.pais)}</span><span>${t.nombre}</span><span class="country">${t.pais}</span></div>`).join("")}</div>`
+html+=`<div class="grupo"><h3>Grupo ${letras[i]}</h3>${g.map(t=>`<div class="team"><img class="logo" src="${logo(t)}" alt="Escudo ${t.nombre}"><span class="flag" title="${countryNames[t.pais]||t.pais}">${flag(t.pais)}</span><span>${t.nombre}</span><span class="country">${countryNames[t.pais]||t.pais}</span></div>`).join("")}</div>`
 })
 
 gruposDiv.innerHTML=html
@@ -177,13 +255,21 @@ async function sortearPasoAPaso(){
 let box=document.getElementById("drawBox")
 box.innerText="Preparando bolilleros...";await esperar(700)
 box.innerText="Sorteando cabezas de serie...";await esperar(700)
-let grupos=crearGruposBase();mostrar(grupos)
+let sorteoFinal=generarSorteo()
+let grupos=sorteoFinal.map(g=>[g[0]])
+mostrar(grupos)
 await esperar(700)
-box.innerText="Bolillero 2";agregarEquipos(grupos,bol2);mostrar(grupos)
+box.innerText="Bolillero 2"
+for(let i=0;i<grupos.length;i++)grupos[i].push(sorteoFinal[i][1])
+mostrar(grupos)
 await esperar(700)
-box.innerText="Bolillero 3";agregarEquipos(grupos,bol3);mostrar(grupos)
+box.innerText="Bolillero 3"
+for(let i=0;i<grupos.length;i++)grupos[i].push(sorteoFinal[i][2])
+mostrar(grupos)
 await esperar(700)
-box.innerText="Bolillero 4";agregarEquipos(grupos,bol4);mostrar(grupos)
+box.innerText="Bolillero 4"
+for(let i=0;i<grupos.length;i++)grupos[i].push(sorteoFinal[i][3])
+mostrar(grupos)
 box.innerText="Sorteo terminado"
 }
 
@@ -227,13 +313,41 @@ stats.innerHTML=texto
 
 function simular1000(){for(let i=0;i<1000;i++)generarSorteo();alert("1000 sorteos simulados")}
 
-function compartir(){
-if(navigator.share){
-navigator.share({title:"Simulador Libertadores",text:"Probá este simulador",url:window.location.href})
-}else{
-navigator.clipboard.writeText(window.location.href)
-alert("Link copiado")
+function generarTextoSorteo(){
+const params=new URLSearchParams(window.location.search)
+if(!params.get("sorteo"))return null
+const grupos=JSON.parse(atob(params.get("sorteo")))
+const letras=["A","B","C","D","E","F","G","H"]
+let txt="🏆 Sorteo Copa Libertadores 2026\n\n"
+grupos.forEach((g,i)=>{
+txt+=`GRUPO ${letras[i]}\n`
+g.forEach(t=>{txt+=`  ${countryNames[t.pais]||t.pais} - ${t.nombre}\n`})
+txt+="\n"
+})
+return txt
 }
+
+function compartir(){
+const txt=generarTextoSorteo()
+if(!txt){alert("Primero hacé el sorteo.");return}
+document.getElementById("shareText").value=txt
+document.getElementById("shareModal").classList.add("active")
+document.getElementById("shareText").select()
+}
+
+function copiarTexto(){
+const ta=document.getElementById("shareText")
+ta.select();ta.setSelectionRange(0,99999)
+try{document.execCommand("copy");alert("✅ Copiado!")}catch(e){alert("Seleccioná el texto manualmente y copialo con Ctrl+C")}
+}
+
+function abrirWhatsApp(){
+const txt=generarTextoSorteo()
+if(txt)window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank")
+}
+
+function cerrarModal(){
+document.getElementById("shareModal").classList.remove("active")
 }
 
 const gruposDiv=document.getElementById("grupos")
