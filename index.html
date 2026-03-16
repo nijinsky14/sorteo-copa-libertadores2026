@@ -42,6 +42,16 @@ button:hover{opacity:0.9}
 .btn-copy{background:#e3b341;color:black;font-weight:bold}
 .btn-close{background:#444;color:white}
 
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulseGroup{0%,100%{box-shadow:0 0 12px rgba(0,0,0,0.6)}50%{box-shadow:0 0 0 3px #e3b341,0 0 20px rgba(227,179,65,0.35)}}
+.team-nueva{animation:slideIn 0.35s ease-out}
+.grupo-highlight{animation:pulseGroup 0.8s ease-out}
+
+.prode-code{background:#0b0b0b;border:2px solid #e3b341;border-radius:8px;padding:10px;font-family:monospace;font-size:11px;word-break:break-all;color:#e3b341;margin:8px 0;text-align:left;max-height:58px;overflow-y:auto}
+.score-box{background:#1a2e1a;border:2px solid #25D366;border-radius:10px;padding:16px;margin-top:14px;font-size:22px;font-weight:bold;color:#25D366;text-align:center}
+.score-detail{font-size:12px;color:#aaa;margin-top:10px;text-align:left;line-height:1.9}
+input[type=text]{width:100%;padding:12px;font-size:16px;border-radius:8px;border:1px solid #444;background:#0b0b0b;color:white;box-sizing:border-box;margin-top:8px}
+
 </style>
 </head>
 
@@ -49,13 +59,13 @@ button:hover{opacity:0.9}
 <header>Simulador Sorteo Libertadores</header>
 <div class="container">
   <div class="controls">
-    <button onclick="sortearPasoAPaso()">🎲 Sorteo paso a paso</button>
-    
+    <button onclick="abrirSorteoConNombre()">🎲 Hacer mi prode</button>
+    <button onclick="compartir()">📱 Compartir</button>
+    <button onclick="abrirVerProde()">👥 Ver prode de otro</button>
+    <button onclick="abrirCompararReal()">🏆 Comparar con el real</button>
     <button onclick="simularCentral()" style="display: none;">🧠 Probabilidad grupo Central</button>
     <button onclick="probabilidadRivales()" style="display: none;">⚽ Probabilidad rivales Central</button>
     <button onclick="simular1000()" style="display: none;">📊 Simular 1000</button>
-    
-    <button onclick="compartir()">📱 Compartir</button>
 </div>
 
 <div class="drawBox" id="drawBox"></div>
@@ -70,13 +80,64 @@ button:hover{opacity:0.9}
 
 <div class="modal-overlay" id="shareModal">
   <div class="modal-box">
-    <h3>📋 Resultado del sorteo</h3>
-    <textarea id="shareText" readonly></textarea>
-    <div class="modal-btns">
-      <button class="btn-copy" onclick="copiarTexto()">📋 Copiar</button>
-      <button class="btn-wa" onclick="abrirWhatsApp()">💬 WhatsApp</button>
-      <button class="btn-close" onclick="cerrarModal()">✕ Cerrar</button>
+    <h3>📋 Compartir sorteo</h3>
+    <div id="shareUrlSection" style="display:none">
+      <p style="color:#aaa;font-size:12px;margin:4px 0">🔗 Compartí este link — tus amigos lo abren y ven tu sorteo directo:</p>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <input type="text" id="shareUrlInput" readonly style="flex:1;padding:8px;font-size:12px;background:#0b0b0b;color:#e3b341;border:1px solid #e3b341;border-radius:6px;cursor:pointer" onclick="this.select()">
+        <button class="btn-copy" style="padding:8px 14px;font-size:13px" onclick="copiarUrl()">Copiar</button>
+      </div>
+      <button class="btn-wa" style="width:100%;margin-top:8px;padding:10px" onclick="compartirWhatsAppUrl()">💬 Mandar por WhatsApp</button>
+      <hr style="border-color:#333;margin:14px 0">
     </div>
+    <div id="prodeCodeSection">
+      <p style="color:#aaa;font-size:12px;margin:4px 0">📌 Tu código de prode (para que otros peguen en "Ver prode de otro"):</p>
+      <div class="prode-code" id="prodeCodeDisplay" onclick="seleccionarCodigo(this)" title="Clic para seleccionar"></div>
+    </div>
+    <textarea id="shareText" readonly style="margin-top:10px"></textarea>
+    <div class="modal-btns">
+      <button class="btn-copy" onclick="copiarTexto()">📋 Copiar texto</button>
+      <button class="btn-wa" onclick="abrirWhatsApp()">💬 WhatsApp</button>
+      <button class="btn-close" onclick="cerrarModal('shareModal')">✕ Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="nombreModal">
+  <div class="modal-box">
+    <h3>⚽ Tu nombre en el prode</h3>
+    <p style="color:#aaa;font-size:13px;margin:4px 0">Ingresá tu nombre antes de sortear</p>
+    <input type="text" id="inputNombre" placeholder="Ej: Franco" onkeydown="if(event.key==='Enter')confirmarNombreYSortear()">
+    <div class="modal-btns" style="margin-top:14px">
+      <button class="btn-copy" onclick="confirmarNombreYSortear()">🎲 ¡Sortear!</button>
+      <button class="btn-close" onclick="cerrarModal('nombreModal')">✕ Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="verProdeModal">
+  <div class="modal-box" style="max-width:560px">
+    <h3>👥 Ver prode de otro</h3>
+    <p style="color:#aaa;font-size:13px;margin:4px 0">Pegá el código de prode de otra persona</p>
+    <textarea id="inputCodigo" style="width:100%;height:72px;background:#0b0b0b;color:#eee;border:1px solid #444;border-radius:8px;padding:10px;font-size:12px;box-sizing:border-box;margin-top:8px" placeholder="Pegá el código acá..."></textarea>
+    <div class="modal-btns" style="margin-top:10px">
+      <button class="btn-copy" onclick="mostrarProdeAjeno()">👁 Ver</button>
+      <button class="btn-close" onclick="cerrarModal('verProdeModal')">✕ Cerrar</button>
+    </div>
+    <div id="verProdeResult"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="compararModal">
+  <div class="modal-box" style="max-width:560px">
+    <h3>🏆 Comparar con el sorteo real</h3>
+    <p style="color:#aaa;font-size:13px;margin:4px 0">Pegá el código del sorteo oficial cuando se realice</p>
+    <textarea id="inputReal" style="width:100%;height:72px;background:#0b0b0b;color:#eee;border:1px solid #444;border-radius:8px;padding:10px;font-size:12px;box-sizing:border-box;margin-top:8px" placeholder="Código del sorteo real..."></textarea>
+    <div class="modal-btns" style="margin-top:10px">
+      <button style="background:#e3b341;color:black;font-weight:bold;padding:12px 22px;font-size:16px;border-radius:8px;border:none;cursor:pointer" onclick="calcularScore()">📊 Ver puntaje</button>
+      <button class="btn-close" onclick="cerrarModal('compararModal')">✕ Cerrar</button>
+    </div>
+    <div id="scoreResult"></div>
   </div>
 </div>
 
@@ -208,7 +269,7 @@ function asignarBolilleroConBacktracking(grupos,equipos,grupoIndex=0){
 if(grupoIndex===grupos.length)return true
 
 const paisesGrupo=grupos[grupoIndex].map(t=>t.pais)
-const candidatos=shuffle(equipos.filter(eq=>!paisesGrupo.includes(eq.pais)))
+const candidatos=shuffle(equipos.filter(eq=>paisesGrupo.filter(p=>p===eq.pais).length<2))
 
 for(const eq of candidatos){
 grupos[grupoIndex].push(eq)
@@ -236,41 +297,46 @@ if(ok4)return grupos
 throw new Error("No se pudo generar un sorteo válido")
 }
 
-function mostrar(grupos){
+function mostrar(grupos,grupoHighlight=-1){
 let letras=["A","B","C","D","E","F","G","H"]
 let html=""
 
 grupos.forEach((g,i)=>{
-html+=`<div class="grupo"><h3>Grupo ${letras[i]}</h3>${g.map(t=>`<div class="team"><img class="logo" src="${logo(t)}" alt="Escudo ${t.nombre}"><span class="flag" title="${countryNames[t.pais]||t.pais}">${flag(t.pais)}</span><span>${t.nombre}</span><span class="country">${countryNames[t.pais]||t.pais}</span></div>`).join("")}</div>`
+const hl=i===grupoHighlight?" grupo-highlight":""
+html+=`<div class="grupo${hl}"><h3>Grupo ${letras[i]}</h3>${g.map((t,ti)=>`<div class="team${i===grupoHighlight&&ti===g.length-1?" team-nueva":""}"><img class="logo" src="${logo(t)}" alt="Escudo ${t.nombre}"><span class="flag" title="${countryNames[t.pais]||t.pais}">${flag(t.pais)}</span><span>${t.nombre}</span><span class="country">${countryNames[t.pais]||t.pais}</span></div>`).join("")}</div>`
 })
 
 gruposDiv.innerHTML=html
 
-// guardar en URL
-let data=btoa(JSON.stringify(grupos))
-history.replaceState(null,"","?sorteo="+data)
+// guardar en URL con código corto
+const bols=[bol1,bol2,bol3,bol4]
+let shortCode=""
+for(let b=0;b<4;b++){for(let g=0;g<8;g++){const idx=bols[b].findIndex(t=>t.nombre===grupos[g]?.[b]?.nombre??"")
+shortCode+=Math.max(0,idx).toString(16)}}
+if(shortCode.length===32)history.replaceState(null,"","?sorteo="+shortCode)
 }
 
 async function sortearPasoAPaso(){
+cerrarModal("nombreModal")
+const letras=["A","B","C","D","E","F","G","H"]
 let box=document.getElementById("drawBox")
-box.innerText="Preparando bolilleros...";await esperar(700)
-box.innerText="Sorteando cabezas de serie...";await esperar(700)
+box.innerHTML="⚙️ Generando sorteo...";await esperar(600)
 let sorteoFinal=generarSorteo()
-let grupos=sorteoFinal.map(g=>[g[0]])
-mostrar(grupos)
-await esperar(700)
-box.innerText="Bolillero 2"
-for(let i=0;i<grupos.length;i++)grupos[i].push(sorteoFinal[i][1])
-mostrar(grupos)
-await esperar(700)
-box.innerText="Bolillero 3"
-for(let i=0;i<grupos.length;i++)grupos[i].push(sorteoFinal[i][2])
-mostrar(grupos)
-await esperar(700)
-box.innerText="Bolillero 4"
-for(let i=0;i<grupos.length;i++)grupos[i].push(sorteoFinal[i][3])
-mostrar(grupos)
-box.innerText="Sorteo terminado"
+let grupos=Array.from({length:8},()=>[])
+
+for(let bol=0;bol<4;bol++){
+box.innerHTML=`🎱 <strong>Bolillero ${bol+1}</strong> — extrayendo...`;await esperar(700)
+for(let g=0;g<8;g++){
+const eq=sorteoFinal[g][bol]
+grupos[g].push(eq)
+box.innerHTML=`🎱 Bolillero ${bol+1} · <strong style="color:#e3b341">Grupo ${letras[g]}</strong> → ${eq.nombre}`
+mostrar(grupos,g)
+await esperar(480)
+}
+}
+
+const nombre=window._prodeNombre||"";
+box.innerHTML="✅ Sorteo terminado"+(nombre?` · Prode de <strong style="color:#e3b341">${nombre}</strong>`:"")
 }
 
 function esperar(ms){return new Promise(r=>setTimeout(r,ms))}
@@ -313,26 +379,166 @@ stats.innerHTML=texto
 
 function simular1000(){for(let i=0;i<1000;i++)generarSorteo();alert("1000 sorteos simulados")}
 
+let _prodeNombre=""
+
+function abrirSorteoConNombre(){
+document.getElementById("inputNombre").value=""
+document.getElementById("nombreModal").classList.add("active")
+setTimeout(()=>document.getElementById("inputNombre").focus(),100)
+}
+
+function confirmarNombreYSortear(){
+const n=document.getElementById("inputNombre").value.trim()
+if(!n){document.getElementById("inputNombre").focus();return}
+window._prodeNombre=n
+sortearPasoAPaso()
+}
+
+function generarCodigoProde(grupos){
+const bols=[bol1,bol2,bol3,bol4]
+let code=""
+for(let b=0;b<4;b++){
+for(let g=0;g<8;g++){
+const idx=bols[b].findIndex(t=>t.nombre===grupos[g][b].nombre)
+code+=idx.toString(16)
+}
+}
+const nombre=window._prodeNombre||"Anónimo"
+return nombre+"|"+code
+}
+
+function decodificarCodigo(raw){
+const sep=raw.indexOf("|")
+let nombre="Anónimo",code=raw
+if(sep!==-1){nombre=raw.slice(0,sep);code=raw.slice(sep+1)}
+if(code.length!==32)throw new Error("código inválido")
+const bols=[bol1,bol2,bol3,bol4]
+const grupos=Array.from({length:8},()=>[])
+for(let b=0;b<4;b++){
+for(let g=0;g<8;g++){
+const idx=parseInt(code[b*8+g],16)
+grupos[g].push(bols[b][idx])
+}
+}
+return{nombre,grupos}
+}
+
+function abrirVerProde(){
+document.getElementById("inputCodigo").value=""
+document.getElementById("verProdeResult").innerHTML=""
+document.getElementById("verProdeModal").classList.add("active")
+}
+
+function mostrarProdeAjeno(){
+const code=document.getElementById("inputCodigo").value.trim()
+if(!code)return
+try{
+const{nombre,grupos}=decodificarCodigo(code)
+const letras=["A","B","C","D","E","F","G","H"]
+let html=`<p style="color:#e3b341;margin-top:12px;font-size:15px">Prode de <strong>${nombre}</strong></p>`
+html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;text-align:left;margin-top:6px">`
+grupos.forEach((g,i)=>{
+html+=`<div style="background:#0b0b0b;border-radius:8px;padding:8px"><strong style="color:#e3b341;font-size:13px">Grupo ${letras[i]}</strong><br>`
+g.forEach(t=>{html+=`<div style="font-size:12px;padding:2px 0">${flag(t.pais)} ${t.nombre}</div>`})
+html+=`</div>`
+})
+html+=`</div>`
+document.getElementById("verProdeResult").innerHTML=html
+}catch(e){document.getElementById("verProdeResult").innerHTML=`<p style="color:#f55">Código inválido</p>`}
+}
+
+function abrirCompararReal(){
+document.getElementById("inputReal").value=""
+document.getElementById("scoreResult").innerHTML=""
+document.getElementById("compararModal").classList.add("active")
+}
+
+function calcularScore(){
+const codeReal=document.getElementById("inputReal").value.trim()
+if(!codeReal){document.getElementById("scoreResult").innerHTML=`<p style="color:#f55">Ingresá el código del sorteo real</p>`;return}
+try{
+const paramsActual=new URLSearchParams(window.location.search)
+if(!paramsActual.get("sorteo")){document.getElementById("scoreResult").innerHTML=`<p style="color:#f55">Primero hacé tu prode</p>`;return}
+const gruposProde=decodificarCodigo(paramsActual.get("sorteo")).grupos
+const{grupos:gruposReal,nombre:nombreReal}=decodificarCodigo(codeReal)
+const letras=["A","B","C","D","E","F","G","H"]
+const realMap={};gruposReal.forEach((g,i)=>g.forEach(t=>{realMap[t.nombre]=i}))
+const prodeMap={};gruposProde.forEach((g,i)=>g.forEach(t=>{prodeMap[t.nombre]=i}))
+const overlap=Array.from({length:8},()=>Array(8).fill(0))
+Object.keys(realMap).forEach(n=>{const ri=realMap[n];const pi=prodeMap[n];if(pi!==undefined)overlap[pi][ri]++})
+let usedR=new Set(),usedP=new Set(),puntos=0,detalles=[]
+for(let k=0;k<8;k++){
+let best=-1,bi=-1,bj=-1
+for(let i=0;i<8;i++){if(usedP.has(i))continue;for(let j=0;j<8;j++){if(usedR.has(j))continue;if(overlap[i][j]>best){best=overlap[i][j];bi=i;bj=j}}}
+if(bi>=0){usedP.add(bi);usedR.add(bj);puntos+=best;if(best>0)detalles.push(`Grupo ${letras[bi]} ↔ ${letras[bj]}: ${best}/4 ✅`)}
+}
+const pct=Math.round(puntos/32*100)
+const emoji=puntos>=28?"🏆":puntos>=20?"🔥":puntos>=12?"👍":"😅"
+document.getElementById("scoreResult").innerHTML=`<div class="score-box">${emoji} ${puntos} / 32 puntos (${pct}%)</div><div class="score-detail">${detalles.join("<br>")||"Sin coincidencias"}</div>`
+}catch(e){document.getElementById("scoreResult").innerHTML=`<p style="color:#f55">Error: código inválido</p>`}
+}
+
 function generarTextoSorteo(){
 const params=new URLSearchParams(window.location.search)
-if(!params.get("sorteo"))return null
-const grupos=JSON.parse(atob(params.get("sorteo")))
+const s=params.get("sorteo")
+if(!s)return null
+try{
+const grupos=decodificarCodigo(s).grupos
 const letras=["A","B","C","D","E","F","G","H"]
-let txt="🏆 Sorteo Copa Libertadores 2026\n\n"
+let txt="🏆 Sorteo Copa Libertadores 2026\n"
+if(window._prodeNombre)txt+=`👤 Prode de ${window._prodeNombre}\n`
+txt+="\n"
 grupos.forEach((g,i)=>{
 txt+=`GRUPO ${letras[i]}\n`
 g.forEach(t=>{txt+=`  ${countryNames[t.pais]||t.pais} - ${t.nombre}\n`})
 txt+="\n"
 })
 return txt
+}catch{return null}
 }
 
 function compartir(){
-const txt=generarTextoSorteo()
-if(!txt){alert("Primero hacé el sorteo.");return}
-document.getElementById("shareText").value=txt
+const params=new URLSearchParams(window.location.search)
+const s=params.get("sorteo")
+if(!s){alert("Primero hacé tu prode.");return}
+
+const esHTTPS=location.protocol==="https:"
+const urlSection=document.getElementById("shareUrlSection")
+const urlInput=document.getElementById("shareUrlInput")
+
+if(esHTTPS){
+const nombre=window._prodeNombre
+const baseUrl=location.origin+location.pathname
+const shareUrl=baseUrl+"?sorteo="+s+(nombre?"&nombre="+encodeURIComponent(nombre):"")
+urlInput.value=shareUrl
+urlSection.style.display="block"
+}else{
+urlSection.style.display="none"
+}
+
+let code=s
+if(window._prodeNombre&&!s.includes("|"))code=window._prodeNombre+"|"+s
+document.getElementById("prodeCodeDisplay").innerText=code
+document.getElementById("shareText").value=generarTextoSorteo()||""
 document.getElementById("shareModal").classList.add("active")
-document.getElementById("shareText").select()
+}
+
+function copiarUrl(){
+const inp=document.getElementById("shareUrlInput")
+inp.select()
+try{document.execCommand("copy");alert("✅ Link copiado!")}catch{alert("Seleccioná el link y copiá con Ctrl+C")}
+}
+
+function compartirWhatsAppUrl(){
+const url=document.getElementById("shareUrlInput").value
+const nombre=window._prodeNombre||"Anónimo"
+const msg=`🏆 Prode de ${nombre} – Sorteo Copa Libertadores 2026\nHacé clic para verlo: ${url}`
+window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank")
+}
+
+function seleccionarCodigo(el){
+const range=document.createRange();range.selectNodeContents(el)
+window.getSelection().removeAllRanges();window.getSelection().addRange(range)
 }
 
 function copiarTexto(){
@@ -346,17 +552,23 @@ const txt=generarTextoSorteo()
 if(txt)window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank")
 }
 
-function cerrarModal(){
-document.getElementById("shareModal").classList.remove("active")
+function cerrarModal(id="shareModal"){
+document.getElementById(id).classList.remove("active")
 }
 
 const gruposDiv=document.getElementById("grupos")
 
 // cargar sorteo desde URL
 const params=new URLSearchParams(window.location.search)
+if(params.get("nombre"))window._prodeNombre=decodeURIComponent(params.get("nombre"))
 if(params.get("sorteo")){
-let grupos=JSON.parse(atob(params.get("sorteo")))
+try{
+const{grupos}=decodificarCodigo(params.get("sorteo"))
 mostrar(grupos)
+if(window._prodeNombre){
+document.getElementById("drawBox").innerHTML=`👁️ Viendo prode de <strong style="color:#e3b341">${window._prodeNombre}</strong>`
+}
+}catch(e){}
 }
 
 mostrarBolilleros()
